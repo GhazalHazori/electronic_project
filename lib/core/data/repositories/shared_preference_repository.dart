@@ -1,0 +1,126 @@
+import 'dart:convert';
+
+import 'package:flutter_application_1/core/data/model/apis/cart_model.dart';
+import 'package:flutter_application_1/core/data/model/apis/product_model.dart';
+import 'package:flutter_application_1/core/data/model/apis/token_info.dart';
+import 'package:flutter_application_1/core/enums/data_type.dart';
+import 'package:get/get.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
+
+class SharedPrefrenceRepository {
+  SharedPreferences globalSharedPrefs = Get.find();
+  String PREF_FIRST_LUNCH = 'first_lunch';
+  String PREF_IS_LOGEED = 'is_logeed';
+  String PREF_TOKEN_INFO = 'token_info';
+  String PREF_APP_LANG = 'aspp_langauge';
+  String PREF_CART_LIST = 'cart_list';
+  String PREF_ORDER_PLACED = 'order_placed';
+  setFirstLunch(bool value) {
+    setPreferance(dataType: DataType.BOOL, key: PREF_FIRST_LUNCH, value: value);
+  }
+
+  setIsLoggedIn(bool value) {
+    setPreferance(dataType: DataType.BOOL, key: PREF_IS_LOGEED, value: value);
+  }
+
+  bool getLogeedIn() {
+    if (globalSharedPrefs.containsKey(PREF_IS_LOGEED)) {
+      return getpreferance(key: PREF_IS_LOGEED);
+    } else
+      return false;
+  }
+
+  setOrderPlaced(bool value) {
+    setPreferance(
+      dataType: DataType.BOOL,
+      key: PREF_ORDER_PLACED,
+      value: value,
+    );
+  }
+
+  bool getOrderPlaced() {
+    if (globalSharedPrefs.containsKey(PREF_ORDER_PLACED)) {
+      return getpreferance(key: PREF_ORDER_PLACED);
+    } else {
+      return false;
+    }
+  }
+
+  setIsAppLangauge(String value) {
+    setPreferance(dataType: DataType.STRING, key: PREF_APP_LANG, value: value);
+  }
+
+  String getAppLangauge() {
+    if (globalSharedPrefs.containsKey(PREF_APP_LANG)) {
+      return getpreferance(key: PREF_APP_LANG);
+    } else
+      return 'tr';
+  }
+
+  bool getFirstLunch() {
+    if (globalSharedPrefs.containsKey(PREF_FIRST_LUNCH))
+      return getpreferance(key: PREF_FIRST_LUNCH);
+    else
+      return true;
+  }
+
+  setTokenInfo(TokenInfo value) {
+    setPreferance(
+      dataType: DataType.STRING,
+      key: PREF_TOKEN_INFO,
+      value: jsonEncode(value),
+    );
+  }
+
+  TokenInfo? getTokenInfo() {
+    if (globalSharedPrefs.containsKey(PREF_TOKEN_INFO)) {
+      return TokenInfo.fromJson(
+          jsonDecode(getpreferance(key: PREF_TOKEN_INFO)));
+    } else {
+      return null;
+    }
+  }
+
+  void setCartList(List<CartModel> list) {
+    setPreferance(
+        dataType: DataType.STRING,
+        key: PREF_CART_LIST,
+        value: CartModel.encode(list));
+  }
+
+  List<CartModel> getCartList() {
+    if (globalSharedPrefs.containsKey(PREF_CART_LIST)) {
+      return CartModel.decode(getpreferance(key: PREF_CART_LIST));
+    } else {
+      return [];
+    }
+  }
+
+  setPreferance(
+      {required DataType dataType,
+      required String key,
+      required dynamic value}) async {
+    switch (dataType) {
+      case DataType.INt:
+        await globalSharedPrefs.setInt(key, value);
+        break;
+      case DataType.BOOL:
+        await globalSharedPrefs.setBool(key, value);
+        break;
+      case DataType.DOUBLE:
+        await globalSharedPrefs.setDouble(key, value);
+        break;
+      case DataType.STRING:
+        await globalSharedPrefs.setString(key, value);
+        break;
+      case DataType.LISTSTRING:
+        await globalSharedPrefs.setStringList(key, value);
+        break;
+    }
+  }
+
+  dynamic getpreferance({required String key}) {
+    return globalSharedPrefs.get(key);
+  }
+}
